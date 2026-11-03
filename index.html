@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Wakil Egypt - نظام العمولة</title>
+<style>
+:root {
+  --bg-main: #0a0a0a;
+  --bg-card: #151515;
+  --bg-card-hover: #1f1f1f;
+  --primary-red: #e50914;
+  --primary-red-hover: #ff1a25;
+  --text-main: #ffffff;
+  --text-muted: #a0a0a0;
+  --border-color: #2a2a2a;
+  --success: #2ecc71;
+  --warning: #f39c12;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg-main);min-height:100vh;color:var(--text-main);padding-bottom:80px;overflow-x:hidden}
+.container{max-width:1100px;margin:0 auto;padding:16px}
+
+/* شاشة الدخول */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg-main);padding:20px}
+.auth-box{background:var(--bg-card);max-width:420px;width:100%;padding:35px;border-radius:16px;border:1px solid var(--border-color);box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.auth-box h1{text-align:center;color:var(--primary-red);margin-bottom:8px;font-size:26px;font-weight:800}
+.auth-box p.sub{text-align:center;color:var(--text-muted);margin-bottom:25px;font-size:14px}
+.field{margin-bottom:16px}
+.field label{display:block;margin-bottom:6px;font-weight:600;font-size:14px;color:var(--text-main)}
+.field input,.field select{width:100%;padding:12px 14px;border:1px solid var(--border-color);border-radius:10px;font-size:15px;background:var(--bg-main);color:var(--text-main);transition:0.3s}
+.field input:focus,.field select:focus{outline:none;border-color:var(--primary-red)}
+.btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--primary-red);color:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:.2s}
+.btn:hover{background:var(--primary-red-hover);transform:translateY(-2px)}
+.btn.secondary{background:var(--bg-card-hover);color:var(--text-main);border:1px solid var(--border-color)}
+.btn.danger{background:#e74c3c}
+.btn.success{background:var(--success)}
+.btn.small{width:auto;padding:7px 14px;font-size:13px}
+.toggle-link{text-align:center;margin-top:16px;font-size:14px;color:var(--text-muted)}
+.toggle-link a{color:var(--primary-red);cursor:pointer;font-weight:600;text-decoration:none}
+.error{color:var(--primary-red);font-size:13px;margin-top:8px;text-align:center;min-height:18px}
+
+/* الهيدر */
+.topbar{background:var(--bg-card);border-bottom:1px solid var(--border-color);padding:18px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:50}
+.topbar h2{font-size:18px;display:flex;align-items:center;gap:8px;color:var(--primary-red);font-weight:800}
+.topbar .user-info{display:flex;align-items:center;gap:10px;font-size:13px}
+.badge{background:rgba(229,9,20,0.1);color:var(--primary-red);border:1px solid rgba(229,9,20,0.3);padding:5px 12px;border-radius:20px;font-weight:700;font-size:12px}
+
+/* شريط التنقل السفلي */
+.navbar{position:fixed;bottom:0;left:0;right:0;background:var(--bg-card);border-top:1px solid var(--border-color);display:flex;justify-content:space-around;padding:12px 0;z-index:100}
+.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border:none;background:none;color:var(--text-muted);font-size:14px;font-weight:700;transition:.2s;flex:1;padding:5px}
+.nav-item.active{color:var(--primary-red)}
+
+/* البطاقات */
+.section-title{font-size:18px;color:var(--text-main);font-weight:800;margin:18px 0 12px;display:flex;align-items:center;gap:8px}
+.card{background:var(--bg-card);border-radius:14px;padding:20px;border:1px solid var(--border-color);margin-bottom:16px}
+
+/* المنتجات */
+.products-grid{display:grid;grid-template-columns:1fr;gap:16px;max-width:500px;margin:0 auto}
+.product-card{background:var(--bg-card);border-radius:16px;overflow:hidden;border:1px solid var(--border-color);transition:.3s;animation:fadeIn 0.5s ease-in-out}
+.product-card:hover{border-color:var(--primary-red)}
+.product-img{width:100%;height:240px;object-fit:cover;background:var(--bg-main);display:block}
+.product-body{padding:20px}
+.product-code{display:inline-block;background:rgba(255,255,255,0.05);color:var(--text-muted);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;margin-bottom:10px;font-family:monospace;border:1px solid var(--border-color)}
+.product-title{font-size:18px;font-weight:800;color:var(--text-main);margin-bottom:8px}
+.product-desc{font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:14px}
+.product-price{font-size:22px;font-weight:900;color:var(--primary-red);margin-bottom:16px}
+.product-price span{font-size:12px;color:var(--text-muted);font-weight:400}
+
+/* قائمة السحوبات (الصفحة الوهمية) */
+.fake-withdrawals{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.fake-item{background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:12px;display:flex;align-items:center;gap:12px;animation:slideUp 0.4s ease-out}
+.fake-avatar{width:45px;height:45px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#777;font-size:18px;flex-shrink:0}
+.fake-info{flex:1}
+.fake-name{font-size:14px;font-weight:700;color:var(--text-main);margin-bottom:2px}
+.fake-phone{font-size:12px;color:var(--text-muted);font-family:monospace;direction:ltr;text-align:right}
+.fake-amount{font-size:16px;font-weight:900;color:var(--success);white-space:nowrap}
+.fake-amount span{font-size:11px;color:var(--text-muted);font-weight:400}
+
+/* مربع المهام الكبير */
+.tasks-box{background:linear-gradient(135deg, #1a1a1a, #0a0a0a);border:1px solid var(--border-color);border-radius:16px;padding:30px 20px;text-align:center;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.tasks-box h3{font-size:16px;margin-bottom:20px;color:var(--text-main);font-weight:700}
+.tasks-nums{display:flex;justify-content:space-around;gap:10px;margin-bottom:24px}
+.tasks-num{flex:1}
+.tasks-num .num{font-size:38px;font-weight:900;line-height:1;color:var(--text-main)}
+.tasks-num .lbl{font-size:12px;color:var(--text-muted);margin-top:8px;font-weight:600}
+.tasks-num.done .num{color:var(--success)}
+.tasks-num.remain .num{color:var(--primary-red)}
+
+/* المحفظة والرصيد */
+.balance-card{background:linear-gradient(135deg, #1a1a1a, #0a0a0a);border:1px solid var(--primary-red);border-radius:16px;padding:30px;text-align:center;margin-bottom:16px;box-shadow:0 10px 30px rgba(229,9,20,0.1)}
+.balance-card .lbl{font-size:14px;color:var(--text-muted);margin-bottom:8px}
+.balance-card .amt{font-size:42px;font-weight:900;margin-bottom:8px;color:var(--primary-red)}
+.balance-card .sub{font-size:13px;color:var(--text-muted)}
+
+/* وسائل الدفع */
+.pay-methods{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin:14px 0}
+.pay-card{border:1px solid var(--border-color);border-radius:12px;padding:16px 8px;text-align:center;cursor:pointer;transition:.2s;background:var(--bg-main);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pay-card:hover{border-color:var(--primary-red)}
+.pay-card.selected{border-color:var(--primary-red);background:rgba(229,9,20,0.05);box-shadow:0 4px 12px rgba(229,9,20,0.2)}
+.pay-card svg{height:32px;width:auto;margin-bottom:8px}
+.pay-card .name{font-size:12px;font-weight:700;color:var(--text-main)}
+
+/* خدمة العملاء */
+.support-box{background:linear-gradient(135deg, #0088cc, #005f8c);color:#fff;border-radius:20px;padding:40px 24px;text-align:center;cursor:pointer;transition:.25s;box-shadow:0 10px 30px rgba(0,136,204,.2);text-decoration:none;display:block;margin-bottom:16px}
+.support-box:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,136,204,.4)}
+.support-box h3{font-size:22px;margin-bottom:8px;font-weight:800;margin-top:10px}
+.support-box p{font-size:14px;opacity:.9;line-height:1.7;margin-bottom:6px}
+.support-box .phone-badge{background:rgba(0,0,0,.2);display:inline-block;padding:8px 20px;border-radius:30px;font-size:16px;font-weight:800;margin-top:10px;font-family:monospace;direction:ltr}
+
+/* سجل المعاملات */
+.tx-list{display:flex;flex-direction:column;gap:10px}
+.tx{background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.tx .info{font-size:13px}
+.tx .info .t{font-weight:700;color:var(--text-main)}
+.tx .info .d{font-size:11px;color:var(--text-muted);margin-top:4px}
+.tx .amt{font-weight:900;font-size:16px}
+.tx .amt.in{color:var(--success)}
+.tx .amt.out{color:var(--primary-red)}
+
+/* لوحة المدير */
+.admin-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tab{background:var(--bg-card);color:var(--text-muted);padding:10px 18px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;border:1px solid var(--border-color);transition:.2s}
+.tab.active{background:var(--primary-red);color:#fff;border-color:var(--primary-red)}
+.panel{background:var(--bg-card);border:1px solid var(--border-color);border-radius:14px;padding:22px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:12px 10px;text-align:right;border-bottom:1px solid var(--border-color)}
+th{background:var(--bg-main);color:var(--primary-red);font-weight:700}
+tr:hover td{background:rgba(255,255,255,0.02)}
+input.edit-inp, select.edit-inp{width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;background:var(--bg-main);color:var(--text-main)}
+input.edit-inp:focus, select.edit-inp:focus{outline:none;border-color:var(--primary-red)}
+
+/* الرسائل المنبثقة */
+.toast-container{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;pointer-events:none;background:transparent}
+.toast-msg{background:rgba(21,21,21,0.95);border:2px solid var(--primary-red);color:#fff;padding:24px 32px;border-radius:16px;font-weight:800;font-size:18px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.8);transform:scale(0.8);opacity:0;transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);line-height:1.6}
+.toast-msg.show{transform:scale(1);opacity:1}
+.toast-msg.success{border-color:var(--success);color:var(--success)}
+.toast-msg.error{border-color:var(--primary-red);color:var(--primary-red)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:600px){
+  .tasks-num .num{font-size:32px}
+  .balance-card .amt{font-size:36px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="toast-container" id="toast-container"><div class="toast-msg" id="toast-msg"></div></div>
+
+<script>
+const DB_KEY='wakil_egypt_db_v6'; // تحديث الإصدار
+const DEFAULT_TELEGRAM = '@wakil_egypt_bot';
+
+const LOGO_VODAFONE = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#e60000"/><path d="M50 65c-8.3 0-15-6.7-15-15s6.7-15 15-15 15 6.7 15 15-6.7 15-15 15zm0-40c-13.8 0-25 11.2-25 25s11.2 25 25 25 25-11.2 25-25-11.2-25-25-25z" fill="#fff"/></svg>`;
+const LOGO_ETISALAT = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#00a651"/><path d="M65 35H45c-5.5 0-10 4.5-10 10v20h20V55H45V45h20V35z" fill="#fff"/><circle cx="55" cy="65" r="10" fill="#fff"/></svg>`;
+const LOGO_ORANGE = `<svg viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" fill="#ff7900"/><text x="50" y="65" font-size="45" font-weight="bold" fill="#fff" text-anchor="middle" font-family="Arial">orange</text></svg>`;
+
+function generateFakeWithdrawals() {
+  const names = ["Ahmed Ali", "Sara Mohamed", "Mahmoud Hassan", "Nourhan Youssef", "Omar Khaled", "Mona Ibrahim", "Youssef Ahmed", "Rana Tarek", "Hany Adel", "Salma Samir", "Karim Nabil", "Dina Osman", "Tamer Fathy", "Aya Hany", "Sherif Magdy", "Mai Adel", "Amr Hassan", "Nada Yasser", "Khaled Mostafa", "Heba Ahmed"];
+  const amounts = [850, 1200, 2500, 3100, 4500, 5000, 6200, 7500, 8000, 9200, 10500, 11000, 12300, 13500, 14200, 15000, 16000, 16800, 17500, 18000];
+  const chars = "0123456789";
+  
+  let list = [];
+  for(let i=0; i<20; i++) {
+    let name = names[i % names.length];
+    let lastDigit = chars[Math.floor(Math.random() * chars.length)];
+    let phone = "01" + "*".repeat(8) + lastDigit;
+    let amount = amounts[i];
+    list.push({ name, phone, amount });
+  }
+  return list.sort(() => Math.random() - 0.5);
+}
+
+function defaultDB(){
+  return {
+    settings: {
+      telegram: DEFAULT_TELEGRAM
+    },
+    users:[
+      {phone:'01000000001',password:'123456',role:'seller',name:'بائع تجريبي',balance:0},
+      {phone:'admin',password:'admin123',role:'admin',name:'المدير',balance:0}
+    ],
+    tasks:[
+      {id:1,icon:'📱',title:'iPhone 15 Pro',code:'IPH-15-2024',
+       img:'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&q=80',
+       desc:'هاتف ذكي بشاشة Super Retina XDR 6.1 بوصة، معالج A17 Pro، كاميرا 48 ميجابكسل، تخزين 256 جيجا.',price:150},
+      {id:2,icon:'💻',title:'MacBook Air M3',code:'MBA-M3-2024',
+       img:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&q=80',
+       desc:'لابتوب خفيف بمعالج Apple M3، شاشة Liquid Retina 13.6 بوصة، ذاكرة 16 جيجا.',price:400},
+      {id:3,icon:'🎧',title:'AirPods Pro 2',code:'APP-PRO-2',
+       img:'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&q=80',
+       desc:'سماعات لاسلكية بإلغاء ضوضاء نشط، صوت مكاني، مقاومة للماء والعرق.',price:80},
+      {id:4,icon:'⌚',title:'Apple Watch Series 9',code:'AW-S9-45',
+       img:'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80',
+       desc:'ساعة ذكية بشاشة Retina دائمة التشغيل 45mm، مراقبة النبض والأكسجين.',price:120},
+      {id:5,icon:'🎮',title:'PlayStation 5 Slim',code:'PS5-SLIM-1TB',
+       img:'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&q=80',
+       desc:'جهاز ألعاب الجيل الجديد، معالج AMD Zen 2، SSD 1 تيرا، دعم 4K/120fps.',price:300}
+    ],
+    completions:[],
+    transactions:[], 
+    messages:[]
+  };
+}
+function loadDB(){
+  try{
+    const r=localStorage.getItem(DB_KEY);
+    if(!r){const db=defaultDB();saveDB(db);return db;}
+    const parsed = JSON.parse(r);
+    // تأمين وجود الإعدادات في حال كان الملف قديماً
+    if(!parsed.settings || !parsed.settings.telegram) {
+      parsed.settings = { telegram: DEFAULT_TELEGRAM };
+    }
+    return parsed;
+  }catch(e){return defaultDB();}
+}
+function saveDB(db){localStorage.setItem(DB_KEY,JSON.stringify(db));}
+
+let DB=loadDB();
+let currentUser=null;
+let currentView='login';
+let sellerPage='products';
+let selectedPayMethod=null;
+let isTasksUnlocked=false;
+let fakeWithdrawalsList = generateFakeWithdrawals();
+
+const $=s=>document.querySelector(s);
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function fmt(n){return Number(n).toLocaleString('ar-EG');}
+
+function toast(msg, type='info', duration=3000) {
+  const el = $('#toast-msg');
+  el.innerHTML = msg;
+  el.className = 'toast-msg show ' + type;
+  clearTimeout(window._toastTm);
+  window._toastTm = setTimeout(()=> { el.classList.remove('show'); }, duration);
+}
+
+function getSellerCompletions(phone){return DB.completions.filter(c=>c.phone===phone);}
+function sellerEarnings(phone){return getSellerCompletions(phone).reduce((s,c)=>{const t=DB.tasks.find(x=>x.id===c.taskId);return s+(t?t.price:0);},0);}
+function sellerActualDeposit(phone){return DB.transactions.filter(t=>t.phone===phone && t.type==='deposit' && t.method !== 'عمولة مبيعات' && t.status==='completed').reduce((s,t)=>s+t.amount,0);}
+function sellerWithdrawn(phone){return DB.transactions.filter(t=>t.phone===phone&&t.type==='withdraw'&&t.status==='completed').reduce((s,t)=>s+t.amount,0);}
+
+function currentBalance(phone){
+  const earnings = sellerEarnings(phone);
+  const actualDeposit = sellerActualDeposit(phone);
+  const withdrawn = sellerWithdrawn(phone);
+  return (earnings + actualDeposit) - withdrawn;
+}
+function nextTxId(){return (DB.transactions.length?Math.max(...DB.transactions.map(t=>t.id)):0)+1;}
+
+function render(){
+  if(currentView==='login')return renderAuth('login');
+  if(currentView==='register')return renderAuth('register');
+  if(currentView==='seller')return renderSeller();
+  if(currentView==='admin')return renderAdmin();
+}
+
+function renderAuth(mode){
+  const isLogin=mode==='login';
+  $('#root').innerHTML=`
+    <div class="auth-wrap">
+      <div class="auth-box">
+        <h1>Wakil Egypt</h1>
+        <p class="sub">${isLogin?'سجّل الدخول لبدء المهام':'أنشئ حساب بائع جديد'}</p>
+        <div class="field"><label>رقم الهاتف</label><input id="in-phone" type="text" placeholder="مثال: 01012345678"></div>
+        ${isLogin?'':`<div class="field"><label>الاسم</label><input id="in-name" type="text" placeholder="اسمك الكامل"></div>`}
+        <div class="field"><label>كلمة المرور</label><input id="in-pass" type="password" placeholder="••••••"></div>
+        <div class="error" id="auth-err"></div>
+        <button class="btn" id="auth-submit">${isLogin?'تسجيل الدخول':'إنشاء الحساب'}</button>
+        <div class="toggle-link">${isLogin?'ليس لديك حساب؟ <a id="to-reg">أنشئ حساباً</a>':'لديك حساب؟ <a id="to-login">تسجيل الدخول</a>'}</div>
+      </div>
+    </div>`;
+  if(isLogin){$('#to-reg').onclick=()=>{currentView='register';render();};$('#auth-submit').onclick=doLogin;$('#in-pass').onkeydown=e=>{if(e.key==='Enter')doLogin();};}
+  else{$('#to-login').onclick=()=>{currentView='login';render();};$('#auth-submit').onclick=doRegister;}
+}
+function doLogin(){
+  const phone=$('#in-phone').value.trim(),pass=$('#in-pass').value,err=$('#auth-err');
+  err.textContent='';
+  if(!phone||!pass){err.textContent='أدخل رقم الهاتف وكلمة المرور';return;}
+  const u=DB.users.find(x=>x.phone===phone&&x.password===pass);
+  if(!u){err.textContent='رقم الهاتف أو كلمة المرور غير صحيحة';return;}
+  currentUser={phone:u.phone,name:u.name,role:u.role};
+  currentView=u.role==='admin'?'admin':'seller';
+  sellerPage='products';
+  isTasksUnlocked = false;
+  toast('مرحباً '+u.name,'success');render();
+}
+function doRegister(){
+  const phone=$('#in-phone').value.trim(),name=$('#in-name').value.trim(),pass=$('#in-pass').value,err=$('#auth-err');
+  err.textContent='';
+  if(!/^[0-9]{8,15}$/.test(phone)){err.textContent='رقم الهاتف غير صالح';return;}
+  if(!name){err.textContent='أدخل اسمك';return;}
+  if(pass.length<6){err.textContent='كلمة المرور 6 أحرف على الأقل';return;}
+  if(DB.users.some(u=>u.phone===phone)){err.textContent='رقم الهاتف مسجّل بالفعل';return;}
+  DB.users.push({phone,password:pass,role:'seller',name,balance:0});saveDB(DB);
+  currentUser={phone,name,role:'seller'};currentView='seller';sellerPage='products';isTasksUnlocked = false;
+  toast('تم إنشاء الحساب بنجاح','success');render();
+}
+
+function renderSeller(){
+  $('#root').innerHTML=`
+    <div class="topbar">
+      <h2>Wakil Egypt</h2>
+      <div class="user-info">
+        <span class="badge">${esc(currentUser.name)}</span>
+        <button class="btn small secondary" onclick="logout()">خروج</button>
+      </div>
+    </div>
+    <div class="container" id="seller-content"></div>
+    <nav class="navbar">
+      <button class="nav-item ${sellerPage==='products'?'active':''}" onclick="gotoSeller('products')">المهام</button>
+      <button class="nav-item ${sellerPage==='balance'?'active':''}" onclick="gotoSeller('balance')">الرصيد</button>
+      <button class="nav-item ${sellerPage==='deposit'?'active':''}" onclick="gotoSeller('deposit')">الإيداع</button>
+      <button class="nav-item ${sellerPage==='support'?'active':''}" onclick="gotoSeller('support')">الدعم</button>
+    </nav>`;
+  renderSellerPage();
+}
+function gotoSeller(page){sellerPage=page;selectedPayMethod=null;renderSeller();}
+function renderSellerPage(){
+  if(sellerPage==='products')return renderProductsPage();
+  if(sellerPage==='balance')return renderBalancePage();
+  if(sellerPage==='deposit')return renderDepositPage();
+  if(sellerPage==='support')return renderSupportPage();
+}
+
+/* ---------- صفحة المهام ---------- */
+function renderProductsPage(){
+  const done=getSellerCompletions(currentUser.phone);
+  const count=done.length, remain=5-count;
+  const locked=count>=2;
+
+  let mainBtn = '';
+  if(!isTasksUnlocked && count < 5) {
+    mainBtn = `<button class="btn" style="padding:16px;font-size:18px;border-radius:12px;margin-bottom:20px" onclick="unlockTasks()">استكمال المهام</button>`;
+  }
+
+  let productsHtml = '';
+  if(isTasksUnlocked || count === 5) {
+    if (count < 5) {
+      const currentTask = DB.tasks[count]; 
+      
+      let btn = '';
+      if (locked) {
+        btn = `<div style="background:rgba(243, 156, 18, 0.1);color:var(--warning);border:1px solid var(--warning);padding:12px;border-radius:10px;text-align:center;font-weight:700;font-size:14px">تواصل مع الدعم لإكمال المهام المتبقية</div>`;
+      } else {
+        btn = `<button class="btn danger" onclick="completeTask(${currentTask.id})" style="padding:14px;font-size:16px">إكمال المهمة والبيع</button>`;
+      }
+
+      productsHtml = `
+        <div class="section-title">المهمة الحالية (${count + 1} من 5)</div>
+        <div class="products-grid">
+          <div class="product-card">
+            <img class="product-img" src="${currentTask.img}" alt="${esc(currentTask.title)}" loading="lazy">
+            <div class="product-body">
+              <span class="product-code">${esc(currentTask.code)}</span>
+              <div class="product-title">${esc(currentTask.title)}</div>
+              <div class="product-desc">${esc(currentTask.desc)}</div>
+              <div class="product-price">${fmt(currentTask.price)} ج.م <span>عمولة</span></div>
+              ${btn}
+            </div>
+          </div>
+        </div>`;
+    } else {
+      productsHtml = `
+        <div class="card" style="text-align:center; background:var(--bg-main); border-color:var(--success); padding:40px 20px;">
+          <h2 style="color:var(--success); margin-bottom:10px;">🎉 مبروك!</h2>
+          <p style="font-size:16px;">لقد أكملت جميع المهام الخمسة بنجاح.</p>
+        </div>`;
+    }
+  }
+
+  const alertHtml=locked?`
+    <div class="card" style="background:rgba(243, 156, 18, 0.1);border:1px solid var(--warning);color:var(--warning);text-align:center;margin-bottom:20px">
+      <h3 style="font-size:16px;margin-bottom:8px">رسالة من خدمة العملاء</h3>
+      <p style="font-size:13px;line-height:1.7">أكملت المهمتين الأولى والثانية. الرجاء <strong>التواصل مع خدمة العملاء</strong> لـ <strong>حل مشاكل المهام</strong> و <strong>استلام الدفعات</strong>.</p>
+      <button class="btn" style="margin-top:14px;background:#0088cc;color:#fff" onclick="openTelegram()">تواصل الآن</button>
+    </div>`:'';
+
+  let fakeHtml = `
+    <div class="section-title" style="margin-top:30px">أحدث عمليات السحب على المنصة</div>
+    <div class="fake-withdrawals">
+      ${fakeWithdrawalsList.map(f => `
+        <div class="fake-item">
+          <div class="fake-avatar">${f.name.charAt(0)}</div>
+          <div class="fake-info">
+            <div class="fake-name">${f.name}</div>
+            <div class="fake-phone">${f.phone}</div>
+          </div>
+          <div class="fake-amount">${fmt(f.amount)} <span>ج.م</span></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  $('#seller-content').innerHTML=`
+    <div class="tasks-box">
+      <h3>لوحة المهام</h3>
+      <div class="tasks-nums">
+        <div class="tasks-num"><div class="num">5</div><div class="lbl">الإجمالي</div></div>
+        <div class="tasks-num done"><div class="num">${count}</div><div class="lbl">مكتمل</div></div>
+        <div class="tasks-num remain"><div class="num">${remain}</div><div class="lbl">متبقي</div></div>
+      </div>
+      ${mainBtn}
+    </div>
+    ${alertHtml}
+    ${productsHtml}
+    ${fakeHtml}
+  `;
+}
+
+function unlockTasks() {
+  isTasksUnlocked = true;
+  toast('تم فتح المهام، يمكنك البدء الآن', 'info');
+  renderSellerPage();
+}
+
+function completeTask(taskId){
+  const done=getSellerCompletions(currentUser.phone);
+  if(done.length>=2&&!done.some(c=>c.taskId===taskId)){
+    toast('يجب التواصل مع خدمة العملاء أولاً','error');
+    setTimeout(openTelegram,1500);return;
+  }
+  if(done.some(c=>c.taskId===taskId)){toast('تمت هذه المهمة بالفعل','error');return;}
+  
+  const t=DB.tasks.find(x=>x.id===taskId);
+  DB.completions.push({phone:currentUser.phone,taskId,date:new Date().toISOString()});
+  
+  DB.transactions.push({
+    id: nextTxId(),
+    phone: currentUser.phone,
+    type: 'deposit',
+    method: 'عمولة مبيعات',
+    amount: t.price,
+    phoneNum: currentUser.phone,
+    date: new Date().toISOString(),
+    status: 'completed'
+  });
+  saveDB(DB);
+
+  const successMsg = `مبروك 🎉<br>تم استكمال المهمة بنجاح<br><span style="font-size:24px;color:#2ecc71">+${fmt(t.price)} ج.م</span><br><span style="font-size:14px;color:#aaa">تمت إضافة العمولة لرصيدك</span>`;
+  toast(successMsg, 'success', 3000);
+
+  renderSellerPage(); 
+
+  if(DB.completions.filter(c=>c.phone===currentUser.phone).length===2){
+    setTimeout(()=>toast('الرجاء التواصل مع خدمة العملاء لـ حل مشاكل المهام واستلام الدفعات','error',5000),4500);
+  }
+}
+
+/* ---------- صفحة الرصيد ---------- */
+function renderBalancePage(){
+  const earnings=sellerEarnings(currentUser.phone);
+  const actualDeposit=sellerActualDeposit(currentUser.phone);
+  const withdrawn=sellerWithdrawn(currentUser.phone);
+  const balance=currentBalance(currentUser.phone);
+  
+  const txs=DB.transactions.filter(t=>t.phone===currentUser.phone).slice().reverse();
+
+  const txHtml=txs.length?txs.map(t=>`
+    <div class="tx">
+      <div class="info">
+        <div class="t">${t.type==='deposit'?'إيداع':'سحب'} - ${esc(t.method)} ${t.status==='pending'?'(معلق)':''}</div>
+        <div class="d">${new Date(t.date).toLocaleString('ar-EG')} • ${esc(t.phoneNum)}</div>
+      </div>
+      <div class="amt ${t.type==='deposit'?'in':'out'}">${t.type==='deposit'?'+':'-'}${fmt(t.amount)} ج.م</div>
+    </div>`).join(''):'<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px">لا توجد معاملات بعد</div>';
+
+  $('#seller-content').innerHTML=`
+    <div class="balance-card">
+      <div class="lbl">إجمالي الرصيد المتاح للسحب</div>
+      <div class="amt">${fmt(balance)} ج.م</div>
+      <div class="sub">رصيد الأرباح: ${fmt(earnings)} ج.م | رصيد الإيداع الفعلي: ${fmt(actualDeposit)} ج.م</div>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div class="card" style="margin:0;text-align:center;padding:14px;background:var(--bg-main)">
+        <div style="font-size:12px;color:var(--text-muted)">رصيد الأرباح (العمولات)</div>
+        <div style="font-size:20px;font-weight:900;color:var(--success)">${fmt(earnings)} ج.م</div>
+      </div>
+      <div class="card" style="margin:0;text-align:center;padding:14px;background:var(--bg-main)">
+        <div style="font-size:12px;color:var(--text-muted)">رصيد الإيداع الفعلي</div>
+        <div style="font-size:20px;font-weight:900;color:var(--primary-red)">${fmt(actualDeposit)} ج.م</div>
+      </div>
+    </div>
+
+    <div class="section-title">طلب سحب</div>
+    <div class="card">
+      <div class="field"><label>رقم المحفظة</label><input id="wd-phone" type="tel" placeholder="01xxxxxxxxx" value="${esc(currentUser.phone)}"></div>
+      <div class="field"><label>المبلغ (ج.م) - الحد الأدنى 500</label><input id="wd-amount" type="number" placeholder="مثال: 500" min="500"></div>
+      <label style="display:block;margin:14px 0 8px;font-weight:600;font-size:14px">اختر وسيلة السحب</label>
+      <div class="pay-methods">
+        <div class="pay-card" onclick="pickMethod(this,'فودافون كاش')">${LOGO_VODAFONE}<div class="name">فودافون كاش</div></div>
+        <div class="pay-card" onclick="pickMethod(this,'اتصالات كاش')">${LOGO_ETISALAT}<div class="name">اتصالات كاش</div></div>
+        <div class="pay-card" onclick="pickMethod(this,'أورنج كاش')">${LOGO_ORANGE}<div class="name">أورنج كاش</div></div>
+      </div>
+      <button class="btn danger" onclick="submitWithdraw()" style="margin-top:10px">إرسال طلب السحب</button>
+    </div>
+
+    <div class="section-title">سجل المعاملات</div>
+    <div class="tx-list">${txHtml}</div>
+  `;
+}
+
+function pickMethod(el,name){
+  document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPayMethod=name;
+}
+
+function submitWithdraw(){
+  const phone=$('#wd-phone').value.trim();
+  const amount=parseFloat($('#wd-amount').value);
+  if(!/^[0-9]{8,15}$/.test(phone))return toast('رقم المحفظة غير صالح','error');
+  if(!amount||amount<500)return toast('أقل مبلغ للسحب 500 ج.م','error');
+  if(!selectedPayMethod)return toast('اختر وسيلة السحب','error');
+  const bal=currentBalance(currentUser.phone);
+  if(amount>bal)return toast('الرصيد غير كافٍ','error');
+
+  DB.transactions.push({
+    id:nextTxId(),phone:currentUser.phone,type:'withdraw',method:selectedPayMethod,
+    amount,phoneNum:phone,date:new Date().toISOString(),status:'pending'
+  });
+  saveDB(DB);
+  toast('جاري استكمال طلب السحب...<br>سيتم التواصل معك قريباً', 'info', 4000);
+  setTimeout(()=>{gotoSeller('balance');}, 500);
+}
+
+/* ---------- صفحة الإيداع ---------- */
+function renderDepositPage(){
+  const txs=DB.transactions.filter(t=>t.phone===currentUser.phone&&t.type==='deposit' && t.method !== 'عمولة مبيعات').slice().reverse();
+  const txHtml=txs.length?txs.map(t=>`
+    <div class="tx">
+      <div class="info">
+        <div class="t">إيداع - ${esc(t.method)} ${t.status==='pending'?'(معلق)':(t.status==='completed'?'(مقبول)':'(مرفوض)')}</div>
+        <div class="d">${new Date(t.date).toLocaleString('ar-EG')}</div>
+      </div>
+      <div class="amt in">+${fmt(t.amount)} ج.م</div>
+    </div>`).join(''):'<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px">لا توجد عمليات إيداع</div>';
+
+  $('#seller-content').innerHTML=`
+    <div class="section-title">إيداع أموال</div>
+    <div class="card" style="border-color:var(--warning)">
+      <p style="font-size:14px;color:var(--warning);margin-bottom:14px;line-height:1.7;font-weight:700">تنبيه: الإيداع يتم من خلال خدمة العملاء. يرجى اختيار الوسيلة وكتابة الرقم الذي قمت بالإيداع منه، ثم إرسال الطلب لتأكيده عبر التلجرام.</p>
+      
+      <div class="field"><label>المبلغ (ج.م) - الحد الأدنى 250</label><input id="dp-amount" type="number" placeholder="مثال: 250" min="250"></div>
+      
+      <label style="display:block;margin:14px 0 8px;font-weight:600;font-size:14px">اختر وسيلة الإيداع</label>
+      <div class="pay-methods">
+        <div class="pay-card" onclick="pickMethod(this,'فودافون كاش')">${LOGO_VODAFONE}<div class="name">فودافون كاش</div></div>
+        <div class="pay-card" onclick="pickMethod(this,'اتصالات كاش')">${LOGO_ETISALAT}<div class="name">اتصالات كاش</div></div>
+        <div class="pay-card" onclick="pickMethod(this,'أورنج كاش')">${LOGO_ORANGE}<div class="name">أورنج كاش</div></div>
+      </div>
+
+      <div class="field" style="margin-top:16px">
+        <label>الرقم الذي أودعت منه (المحفظة)</label>
+        <input id="dp-phone" type="tel" placeholder="01xxxxxxxxx">
+      </div>
+
+      <button class="btn success" onclick="submitDeposit()" style="margin-top:10px;padding:14px;font-size:16px">إرسال طلب الإيداع</button>
+    </div>
+
+    <div class="section-title">سجل الإيداعات</div>
+    <div class="tx-list">${txHtml}</div>
+  `;
+}
+
+function submitDeposit(){
+  const amount=parseFloat($('#dp-amount').value);
+  const senderPhone=$('#dp-phone').value.trim();
+  
+  if(!amount||amount<250)return toast('أقل مبلغ للإيداع 250 ج.م','error');
+  if(!selectedPayMethod)return toast('اختر وسيلة الإيداع','error');
+  if(!/^[0-9]{8,15}$/.test(senderPhone))return toast('أدخل الرقم الذي أودعت منه بشكل صحيح','error');
+
+  DB.transactions.push({
+    id:nextTxId(),phone:currentUser.phone,type:'deposit',method:selectedPayMethod,
+    amount,phoneNum:senderPhone,date:new Date().toISOString(),status:'pending'
+  });
+  saveDB(DB);
+  toast('تم تسجيل طلب الإيداع<br>جاري تحويلك لخدمة العملاء لتأكيد الإيداع...', 'info', 3000);
+  
+  setTimeout(()=>{
+    const msg = `مرحباً، أنا ${currentUser.name} (${currentUser.phone}).\nأرغب في إيداع مبلغ ${amount} ج.م.\nوسيلة الإيداع: ${selectedPayMethod}.\nالرقم الذي أودعت منه: ${senderPhone}.`;
+    window.open(`https://t.me/${DB.settings.telegram.replace('@','')}?text=${encodeURIComponent(msg)}`, '_blank');
+    gotoSeller('deposit');
+  }, 1500);
+}
+
+/* ---------- صفحة الدعم ---------- */
+function renderSupportPage(){
+  $('#seller-content').innerHTML=`
+    <div class="section-title">خدمة العملاء</div>
+    <a class="support-box" href="https://t.me/${DB.settings.telegram.replace('@','')}" target="_blank">
+      <h3>تواصل مع خدمة العملاء</h3>
+      <p>اضغط للتواصل عبر التلجرام مباشرة</p>
+      <span class="phone-badge">${DB.settings.telegram}</span>
+    </a>
+    <div class="card" style="background:var(--bg-main)">
+      <h3 style="color:var(--primary-red);margin-bottom:12px;font-size:16px">كيف يمكننا مساعدتك؟</h3>
+      <ul style="font-size:14px;color:var(--text-muted);line-height:2;list-style:none">
+        <li>- حل مشاكل المهام</li>
+        <li>- استلام الدفعات</li>
+        <li>- متابعة طلبات السحب والإيداع</li>
+        <li>- أي استفسار آخر</li>
+      </ul>
+    </div>
+  `;
+}
+
+function openTelegram(){
+  window.open('https://t.me/' + DB.settings.telegram.replace('@',''), '_blank');
+}
+
+/* ============ لوحة المدير ============ */
+let adminTab='users';
+function renderAdmin(){
+  const tabs=[['users','المستخدمون'],['tasks','المنتجات'],['deposits','طلبات الإيداع'],['withdraws','طلبات السحب'],['settings','إعدادات']];
+  $('#root').innerHTML=`
+    <div class="topbar"><h2>لوحة تحكم Wakil Egypt</h2><div class="user-info"><span class="badge">مدير</span><button class="btn small secondary" onclick="logout()">خروج</button></div></div>
+    <div class="container">
+      <div class="admin-tabs">${tabs.map(([k,l])=>`<div class="tab ${adminTab===k?'active':''}" onclick="setAdminTab('${k}')">${l}</div>`).join('')}</div>
+      <div class="panel" id="admin-panel"></div>
+    </div>`;
+  renderAdminPanel();
+}
+function setAdminTab(t){adminTab=t;renderAdmin();}
+function renderAdminPanel(){
+  const p=$('#admin-panel');if(!p)return;
+  if(adminTab==='users')return adminUsers(p);
+  if(adminTab==='tasks')return adminTasks(p);
+  if(adminTab==='deposits')return adminDeposits(p);
+  if(adminTab==='withdraws')return adminWithdraws(p);
+  if(adminTab==='settings')return adminSettings(p);
+}
+
+function adminUsers(p){
+  const rows=DB.users.map(u=>{
+    const done=DB.completions.filter(c=>c.phone===u.phone).length;
+    const bal=currentBalance(u.phone);
+    return `<tr><td>${esc(u.name)}</td><td>${esc(u.phone)}</td><td>${u.role==='admin'?'مدير':'بائع'}</td><td>${done}/5</td><td>${fmt(bal)} ج.م</td><td><input class="edit-inp" style="width:110px" value="${esc(u.password)}" onchange="adminSetPass('${u.phone}',this.value)"></td><td>${u.role!=='admin'?`<button class="btn small danger" onclick="adminDelUser('${u.phone}')">حذف</button>`:'—'}</td></tr>`;
+  }).join('');
+  p.innerHTML=`<h3 style="margin-bottom:14px;color:var(--primary-red)">المستخدمون</h3>
+    <div style="overflow-x:auto"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الدور</th><th>المهام</th><th>الرصيد</th><th>كلمة المرور</th><th>إجراء</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function adminSetPass(phone,pass){const u=DB.users.find(x=>x.phone===phone);if(!u)return;u.password=pass;saveDB(DB);toast('تم التحديث','success');}
+function adminDelUser(phone){if(!confirm('حذف المستخدم؟'))return;DB.users=DB.users.filter(u=>u.phone!==phone);DB.completions=DB.completions.filter(c=>c.phone!==phone);DB.transactions=DB.transactions.filter(t=>t.phone!==phone);saveDB(DB);toast('تم الحذف','success');renderAdmin();}
+
+function adminTasks(p){
+  const rows=DB.tasks.map((t,i)=>`
+    <tr><td>${i+1}</td><td><input class="edit-inp" value="${esc(t.icon)}" style="width:44px" onchange="adminTaskField(${t.id},'icon',this.value)"></td>
+    <td><input class="edit-inp" value="${esc(t.title)}" onchange="adminTaskField(${t.id},'title',this.value)"></td>
+    <td><input class="edit-inp" value="${esc(t.code)}" onchange="adminTaskField(${t.id},'code',this.value)"></td>
+    <td><input class="edit-inp" value="${esc(t.desc)}" onchange="adminTaskField(${t.id},'desc',this.value)"></td>
+    <td><input class="edit-inp" type="number" value="${t.price}" style="width:80px" onchange="adminTaskField(${t.id},'price',+this.value)"></td></tr>`).join('');
+  p.innerHTML=`<h3 style="margin-bottom:14px;color:var(--primary-red)">المنتجات / المهام</h3><div style="overflow-x:auto"><table><thead><tr><th>#</th><th>أيقونة</th><th>الاسم</th><th>الكود</th><th>الوصف</th><th>العمولة</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function adminTaskField(id,f,v){const t=DB.tasks.find(x=>x.id===id);if(!t)return;t[f]=v;saveDB(DB);toast('تم الحفظ','success');}
+
+function adminDeposits(p){
+  const rows=DB.transactions.filter(t=>t.type==='deposit' && t.method !== 'عمولة مبيعات').slice().reverse().map(t=>{
+    const u=DB.users.find(x=>x.phone===t.phone);
+    return `<tr><td>${u?esc(u.name):t.phone}</td><td>${esc(t.method)}</td><td>${fmt(t.amount)} ج.م</td><td>${esc(t.phoneNum)}</td><td>${new Date(t.date).toLocaleDateString('ar-EG')}</td>
+    <td><select class="edit-inp" style="background:var(--bg-card);color:#fff" onchange="adminTxStatus(${t.id},this.value)">
+      <option value="pending" ${t.status==='pending'?'selected':''}>معلق</option>
+      <option value="completed" ${t.status==='completed'?'selected':''}>مقبول</option>
+      <option value="rejected" ${t.status==='rejected'?'selected':''}>مرفوض</option>
+    </select></td></tr>`;
+  }).join('');
+  p.innerHTML=`<h3 style="margin-bottom:14px;color:var(--primary-red)">طلبات الإيداع</h3><div style="overflow-x:auto"><table><thead><tr><th>البائع</th><th>الوسيلة</th><th>المبلغ</th><th>رقم المحفظة (المرسل)</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">لا توجد طلبات</td></tr>'}</tbody></table></div>`;
+}
+
+function adminWithdraws(p){
+  const rows=DB.transactions.filter(t=>t.type==='withdraw').slice().reverse().map(t=>{
+    const u=DB.users.find(x=>x.phone===t.phone);
+    return `<tr><td>${u?esc(u.name):t.phone}</td><td>${esc(t.method)}</td><td>${fmt(t.amount)} ج.م</td><td>${esc(t.phoneNum)}</td><td>${new Date(t.date).toLocaleDateString('ar-EG')}</td>
+    <td><select class="edit-inp" style="background:var(--bg-card);color:#fff" onchange="adminTxStatus(${t.id},this.value)">
+      <option value="pending" ${t.status==='pending'?'selected':''}>معلق</option>
+      <option value="completed" ${t.status==='completed'?'selected':''}>مكتمل</option>
+      <option value="rejected" ${t.status==='rejected'?'selected':''}>مرفوض</option>
+    </select></td></tr>`;
+  }).join('');
+  p.innerHTML=`<h3 style="margin-bottom:14px;color:var(--primary-red)">طلبات السحب</h3><div style="overflow-x:auto"><table><thead><tr><th>البائع</th><th>الوسيلة</th><th>المبلغ</th><th>رقم المحفظة</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">لا توجد طلبات</td></tr>'}</tbody></table></div>`;
+}
+function adminTxStatus(id,status){const t=DB.transactions.find(x=>x.id===id);if(!t)return;t.status=status;saveDB(DB);toast('تم تحديث الحالة','success');}
+
+function adminSettings(p){
+  p.innerHTML=`
+    <h3 style="margin-bottom:14px;color:var(--primary-red)">إعدادات الموقع العامة</h3>
+    
+    <div class="field" style="background:var(--bg-main);padding:15px;border-radius:10px;border:1px solid var(--border-color);margin-bottom:20px">
+      <label style="color:var(--primary-red);font-size:16px">تعديل يوزر التلجرام لخدمة العملاء</label>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <input class="edit-inp" id="admin-tg" type="text" value="${esc(DB.settings.telegram)}" placeholder="مثال: @wakil_egypt_bot" style="flex:1">
+        <button class="btn success" onclick="adminSaveTG()" style="width:auto">حفظ</button>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:8px">ملاحظة: هذا اليوزر سيُستخدم في زر الدعم وفي رسائل تأكيد الإيداع.</p>
+    </div>
+
+    <div style="border-top:1px solid var(--border-color);padding-top:20px">
+      <h3 style="margin-bottom:14px;color:var(--primary-red)">إدارة النظام</h3>
+      <p style="font-size:14px;line-height:2;color:var(--text-main)">
+        - إجمالي المستخدمين: ${DB.users.length}<br>
+        - إجمالي المهام المكتملة: ${DB.completions.length}<br>
+        - إجمالي طلبات السحب: ${DB.transactions.filter(t=>t.type==='withdraw').length}<br>
+        - إجمالي طلبات الإيداع: ${DB.transactions.filter(t=>t.type==='deposit' && t.method !== 'عمولة مبيعات').length}
+      </p>
+      <button class="btn danger" onclick="adminResetAll()" style="margin-top:15px">إعادة تعيين كل البيانات وحذف الكل</button>
+    </div>
+  `;
+}
+
+function adminSaveTG(){
+  const val = $('#admin-tg').value.trim();
+  if(!val || !val.startsWith('@')) return toast('الرجاء كتابة اليوزر بشكل صحيح يبدأ بـ @', 'error');
+  DB.settings.telegram = val;
+  saveDB(DB);
+  toast('تم حفظ يوزر التلجرام بنجاح', 'success');
+  renderAdmin();
+}
+
+function adminResetAll(){if(!confirm('سيتم حذف كل شيء وإعادته للوضع الافتراضي. متأكد؟'))return;DB=defaultDB();saveDB(DB);currentUser=null;currentView='login';toast('تمت إعادة التعيين','success');render();}
+
+function logout(){currentUser=null;currentView='login';render();toast('تم الخروج','info');}
+
+render();
+</script>
+</body>
+</html>
